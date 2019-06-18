@@ -27,34 +27,33 @@ for a, b in zip(uniqueMolecules, numAtoms):
     uniqueMoleculeValues.append([temp,a,b])
 
 uniqueMoleculeValues.sort(key=lambda molecule: molecule[0])
-
+print(structureDataRaw)
 # Keep counter for index values.
 idCounter = 0
 
 for entry in uniqueMoleculeValues:
 
+    # TODO: Make separate entries; this will just put a list of bond distances in a single array per the first
+    # entry for each molecule.
+
     # Create a list with the possible combinations.
     combList = list(it.combinations(range(0,entry[2]),2))
-    combListInd = [x + idCounter for x in combList]                # Keeping track by index.
+    combListInd = []
+    for x in combList:
+        combListInd.append(list(x))
 
     # Start calculating bond lengths.
     lengths = []
     for i in combListInd:
-        x1, y1, y2 = structureDataRaw.loc[idCounter,i[3]], structureDataRaw.loc[idCounter,i[4]], structureDataRaw.loc[idCounter,i[5]]
-        x1, y1, y2 = structureDataRaw.loc[idCounter, i[3]], structureDataRaw.loc[idCounter, i[4]], structureDataRaw.loc[
-            idCounter, i[5]]
-        length =
+        x1, y1, z1 = structureDataRaw.iloc[i[0],3], structureDataRaw.iloc[i[0],4], structureDataRaw.iloc[i[0],4]
+        x2, y2, z2 = structureDataRaw.iloc[i[1],3], structureDataRaw.iloc[i[1],4], structureDataRaw.iloc[i[1],4]
+        length = math.sqrt((x1 - x2)**2 + (y1 - y2)**2 + (z1 - z2)**2)
+        lengths.append(length)
 
+    structureDataRaw.iat[idCounter, 6] = lengths
+    idCounter += entry[2]
+    print(idCounter)
 
+# Check to see if everything is a-OK.
+print(structureDataRaw.head(10))
 
-
-# for moleculePair in uniqueMoleculeValues:
-#     if moleculePair[0] ==
-
-# uniqueValues = (structureDataRaw['molecule_name'].value_counts().index.values.tolist(),
-#                 structureDataRaw['molecule_name'].value_counts().values.tolist())
-#
-# print(uniqueValues)
-
-# for molecule in uniqueValues:
-#     if structureDataRaw['molecule_name'] == molecule:
