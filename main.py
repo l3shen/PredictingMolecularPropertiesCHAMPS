@@ -29,6 +29,8 @@ uniqueMoleculeValues.sort(key=lambda molecule: molecule[0])
 # Keep counter for index values for the following for loop.
 idCounter = 0
 
+print("Preparing bond lengths.")
+
 for entry in uniqueMoleculeValues:
 
     # TODO: Make separate entries; this will just put a list of bond distances in a single array per the first
@@ -54,3 +56,10 @@ for entry in uniqueMoleculeValues:
 
 # Check to see if everything is a-OK.
 print(structureDataRaw.head(20))
+
+# Save new structure data to csv file for ease of access later.
+# TODO: Save as HDF5? Pickle seems to run out of memory fast.
+
+print("Saving results to CSV file.")
+
+structureDataRaw.to_csv("structuresUpdated.csv")
