@@ -51,8 +51,6 @@ for entry in uniqueMoleculeValues:
     # Update index counter and store results in first index for each unique molecule.
     structureDataRaw.iat[idCounter, 6] = lengths
     idCounter += entry[2]
-    print(idCounter)
 
 # Check to see if everything is a-OK.
-print(structureDataRaw.head(10))
-
+print(structureDataRaw.head(20))
