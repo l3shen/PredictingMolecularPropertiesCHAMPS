@@ -14,9 +14,6 @@ structureDataRaw['lengths'] = ""                                # Array for stor
 
 # Determine number of type/connection parameters for the molecules.
 resultTemp = trainDataRaw['type'].value_counts()
-print(resultTemp)
-
-# print(list(it.combinations([1,2,3,4], 2)))
 
 # Determine list of unique molecule names.
 numAtoms = structureDataRaw['molecule_name'].value_counts()
@@ -26,9 +23,10 @@ for a, b in zip(uniqueMolecules, numAtoms):
     temp = int(a.split("_")[1])
     uniqueMoleculeValues.append([temp,a,b])
 
+# Sort in ascending order.
 uniqueMoleculeValues.sort(key=lambda molecule: molecule[0])
-print(structureDataRaw)
-# Keep counter for index values.
+
+# Keep counter for index values for the following for loop.
 idCounter = 0
 
 for entry in uniqueMoleculeValues:
@@ -50,6 +48,7 @@ for entry in uniqueMoleculeValues:
         length = math.sqrt((x1 - x2)**2 + (y1 - y2)**2 + (z1 - z2)**2)
         lengths.append(length)
 
+    # Update index counter and store results in first index for each unique molecule.
     structureDataRaw.iat[idCounter, 6] = lengths
     idCounter += entry[2]
     print(idCounter)
