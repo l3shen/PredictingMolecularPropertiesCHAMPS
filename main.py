@@ -45,8 +45,8 @@ for entry in uniqueMoleculeValues:
     # Start calculating bond lengths.
     lengths = []
     for i in combListInd:
-        x1, y1, z1 = structureDataRaw.iloc[i[0],3], structureDataRaw.iloc[i[0],4], structureDataRaw.iloc[i[0],4]
-        x2, y2, z2 = structureDataRaw.iloc[i[1],3], structureDataRaw.iloc[i[1],4], structureDataRaw.iloc[i[1],4]
+        x1, y1, z1 = structureDataRaw.iloc[i[0 + idCounter],3], structureDataRaw.iloc[i[0 + idCounter],4], structureDataRaw.iloc[i[0 + idCounter],5]
+        x2, y2, z2 = structureDataRaw.iloc[i[1 + idCounter],3], structureDataRaw.iloc[i[1 + idCounter],4], structureDataRaw.iloc[i[1 + idCounter],5]
         length = math.sqrt((x1 - x2)**2 + (y1 - y2)**2 + (z1 - z2)**2)
         lengths.append(length)
 
