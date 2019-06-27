@@ -1,5 +1,5 @@
-import numpy as np # linear algebra
-import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
+import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 
 
@@ -8,7 +8,7 @@ structures = pd.read_csv("C:\\Users\\azn_k\\PycharmProjects\\PredictingNMR\\stru
 structures.head()
 #print(structures.head())
 
-#gotta try and plot this bad boy in 2d-2d
+#gotta try and plot this bad boy in 2d plots
 
 M = 8000
 fig, ax = plt.subplots(1, 3, figsize=(20, 5))

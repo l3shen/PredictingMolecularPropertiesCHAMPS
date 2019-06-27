@@ -4,8 +4,8 @@ import itertools as it
 import math
 
 # Define file locations (for my local machine/in my working directory).
-trainDataLocation = "train.csv"
-structureDataLocation = "structures.csv"
+trainDataLocation = "C:\\Users\\azn_k\\PycharmProjects\\PredictingNMR\\train.csv"
+structureDataLocation = "C:\\Users\\azn_k\\PycharmProjects\\PredictingNMR\\structures.csv"
 
 # Load in data.
 trainDataRaw = pd.read_csv(trainDataLocation, header=0)
