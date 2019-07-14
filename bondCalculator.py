@@ -5,12 +5,23 @@ import math
 import time
 import sys
 
-def calcBondLengths(trainDataLocation, structureDataLocation, dipoleDataLocation, saveResults=True, verbose=True):
+TYPE_DICT = {
+    '3JHC': 0,
+    '2JHC': 1,
+    '1JHC': 2,
+    '3JHH': 3,
+    '2JHH': 4,
+    '3JHN': 5,
+    '2JHN': 6,
+    '1JHN': 7
+}
+
+def calcBondLengths(trainDataLocation, structureDataLocation, saveResults=True, verbose=True):
 
     # Load in data.
     trainDataRaw = pd.read_csv(trainDataLocation, header=0, index_col='id')
     structureDataRaw = pd.read_csv(structureDataLocation, header=0)
-    dipoleData = pd.read_csv(dipoleDataLocation, header=0)
+    # dipoleData = pd.read_csv(dipoleDataLocation, header=0)
 
     print("Preparing data.")
 
@@ -21,6 +32,9 @@ def calcBondLengths(trainDataLocation, structureDataLocation, dipoleDataLocation
     print("Calculating bond lengths.")
     # Calculate bond length
     trainData['bond_dist'] = trainData.apply(lambda x: dist(x), axis=1)
+
+    # Convert type data to generic integer format.
+    trainData['type'].replace(TYPE_DICT, inplace=True)
 
     # Check to see if everything is a-OK.
     if verbose:
@@ -52,3 +66,7 @@ def dist(row):
     return ( (row['x_1'] - row['x_0'])**2 +
              (row['y_1'] - row['y_0'])**2 +
              (row['z_1'] - row['z_0'])**2 ) ** 0.5
+
+
+
+
