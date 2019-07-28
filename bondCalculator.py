@@ -19,7 +19,7 @@ TYPE_DICT = {
 def calcBondLengths(trainDataLocation, structureDataLocation, saveResults=True, verbose=True):
 
     # Load in data.
-    trainDataRaw = pd.read_csv(trainDataLocation, header=0, index_col='id')
+    trainDataRaw = pd.read_csv(trainDataLocation, header=0)
     structureDataRaw = pd.read_csv(structureDataLocation, header=0)
     # dipoleData = pd.read_csv(dipoleDataLocation, header=0)
 
@@ -34,7 +34,7 @@ def calcBondLengths(trainDataLocation, structureDataLocation, saveResults=True, 
     trainData['bond_dist'] = trainData.apply(lambda x: dist(x), axis=1)
 
     # Convert type data to generic integer format.
-    trainData['type'].replace(TYPE_DICT, inplace=True)
+    # trainData['type'].replace(TYPE_DICT, inplace=True)
 
     # Check to see if everything is a-OK.
     if verbose:

@@ -33,9 +33,7 @@ elif os.path.isfile('testDataPrepared.csv'):
     testDataProc = pd.read_csv('testDataPrepared.csv', header=0)
 
 # Prepare train X and Y column names.
-trainColumnsX = ['bond_dist', 'type']
-trainColumnsXFeat = ['bond_dist']
-trainColumnsXCat = ['type']
+trainColumnsX = ['bond_dist']
 trainColumnsY = ['scalar_coupling_constant']
 
 # Perform K-fold split and prepare model.
@@ -44,11 +42,10 @@ result = next(kfold.split(trainDataProc), None)
 train = trainDataProc.iloc[result[0]]
 test = trainDataProc.iloc[result[1]]
 
+
 # Train model via lightGBM.
-lgbTrain = lgb.Dataset(train[trainColumnsX].values, train[trainColumnsY].values,
-                       feature_name=trainColumnsXFeat, categorical_feature=trainColumnsXCat)
-lgbEval = lgb.Dataset(test[trainColumnsX].values, test[trainColumnsY].values,
-                      feature_name=trainColumnsXFeat, categorical_feature=trainColumnsXCat)
+lgbTrain = lgb.Dataset(train[trainColumnsX], train[trainColumnsY])
+lgbEval = lgb.Dataset(test[trainColumnsX], test[trainColumnsY])
 
 # Model parameters.
 params = {
@@ -57,7 +54,7 @@ params = {
     'metric': {'mae'},
     'num_leaves': 25,
     'learning_rate': 0.0001,
-    'num_iterations': 100000,
+    'num_iterations': 500,
     'feature_fraction': 0.9,
     'bagging_fraction': 0.8,
     'bagging_freq': 5,
@@ -70,13 +67,18 @@ gbm = lgb.train(params,
                 lgbTrain,
                 num_boost_round=200,
                 valid_sets=lgbEval,
-                early_stopping_rounds=5000)
+                early_stopping_rounds=500)
 
 print("Saving model.")
 gbm.save_model('fitModel.txt')
 print("Model saved.")
 
-# TODO: Apply model to imported test data.
 
-# Save submission file from trained data (currently untested as no predictedData object exists yet).
-submissionDataSet = saveSubmissionFile.saveSubmissionFile(#predictedData, saveData=True)
+# TODO: Apply model to imported test data.
+print(testDataProc.head())
+testSubmissionX = ['bond_dist']
+prediction = gbm.predict(testDataProc[testSubmissionX])
+testDataSubmission = testDataProc[['id']]
+testDataSubmission['scalar_coupling_constant'] = prediction # Can be made better. Use iloc.
+print(testDataSubmission.head())
+testDataSubmission.to_csv('submissionCSV.csv', index_label=False)

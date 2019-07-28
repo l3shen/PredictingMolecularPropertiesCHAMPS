@@ -3,7 +3,7 @@ import pandas as pd
 def calcBondLengths(testDataLocation, structureDataLocation, saveResults=True):
 
     # Load in data.
-    testDataRaw = pd.read_csv(testDataLocation, header=0, index_col='id')
+    testDataRaw = pd.read_csv(testDataLocation, header=0)
     structureDataRaw = pd.read_csv(structureDataLocation, header=0)
 
     print("Preparing test data.")
@@ -14,6 +14,7 @@ def calcBondLengths(testDataLocation, structureDataLocation, saveResults=True):
 
     print("Calculating test bond lengths.")
     testData['bond_dist'] = testData.apply(lambda x: dist(x), axis=1)
+    # testData['id'] = testDataRaw['id']
 
     if saveResults:
         print("Saving refined test dataset to CSV file.")
