@@ -26,11 +26,15 @@ elif os.path.isfile('trainDataPrepared.csv'):
 if os.path.isfile('testDataPrepared.csv') == False:
     # Prepare data to include bond lengths.
     print("Processing test data...")
-    testDataProc = importTestData.calcBondLengths(testDataLocation, structureDataLocation)
+    testDataProc = bondCalculator.calcBondLengths(testDataLocation, structureDataLocation)
 elif os.path.isfile('testDataPrepared.csv'):
     # Load in existing dataset.
     print("Loading test data...")
     testDataProc = pd.read_csv('testDataPrepared.csv', header=0)
+
+# TODO: Split in to 8 data sets (x2 for train and test).
+
+# for loop start
 
 # Prepare train X and Y column names.
 trainColumnsX = ['bond_dist']
@@ -72,7 +76,7 @@ gbm = lgb.train(params,
 print("Saving model.")
 gbm.save_model('fitModel.txt')
 print("Model saved.")
-
+# for loop end
 
 # TODO: Apply model to imported test data.
 print(testDataProc.head())

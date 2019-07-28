@@ -16,10 +16,10 @@ TYPE_DICT = {
     '1JHN': 7
 }
 
-def calcBondLengths(trainDataLocation, structureDataLocation, saveResults=True, verbose=True):
+def calcBondLengths(dataLocation, structureDataLocation, saveResults=True, verbose=True):
 
     # Load in data.
-    trainDataRaw = pd.read_csv(trainDataLocation, header=0)
+    trainDataRaw = pd.read_csv(dataLocation, header=0)
     structureDataRaw = pd.read_csv(structureDataLocation, header=0)
     # dipoleData = pd.read_csv(dipoleDataLocation, header=0)
 
