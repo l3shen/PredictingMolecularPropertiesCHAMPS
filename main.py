@@ -10,18 +10,20 @@ TYPES_LIST = [
 ]
 
 import bondCalculator
+import generateFeatures
 import saveSubmissionFile
 import importTestData
 import sklearn.model_selection as mls
 import lightgbm as lgb
 import os
 import pandas as pd
+from collections import Counter
 
 # Define file locations (for my local machine/in my working directory).
-trainDataLocation = "train.csv"
-testDataLocation = "test.csv"
-structureDataLocation = "structures.csv"
-dipoleDataLocation = "dipole_moments.csv"
+trainDataLocation = "C:\\Users\\lawre\\Downloads\\train.csv (1)\\train.csv"
+testDataLocation = "C:\\Users\\lawre\\Downloads\\train.csv (1)\\test.csv"
+structureDataLocation = "structureDataPrepared.csv" #NEW: created new structure csv by adding total number of atoms in each molecule using 'total_num_atoms.py'
+#dipoleDataLocation = "dipole_moments.csv"
 
 # Prepare train data.
 if os.path.isfile('trainDataPrepared.csv') == False:
@@ -33,7 +35,7 @@ elif os.path.isfile('trainDataPrepared.csv'):
     print("Loading train data...")
     trainDataProc = pd.read_csv('trainDataPrepared.csv', header=0)
 
-# Prepare test data.
+#Prepare test data.
 if os.path.isfile('testDataPrepared.csv') == False:
     # Prepare data to include bond lengths.
     print("Processing test data...")
@@ -42,6 +44,18 @@ elif os.path.isfile('testDataPrepared.csv'):
     # Load in existing dataset.
     print("Loading test data...")
     testDataProc = pd.read_csv('testDataPrepared.csv', header=0)
+
+
+#NEW: creating new groups to groupby and generating new features
+trainDataProc=generateFeatures.newGroupBy(trainDataProc)
+
+trainDataProc, added_features0=generateFeatures.generate_features(trainDataProc, 'molecule_name')
+trainDataProc, added_features1=generateFeatures.generate_features(trainDataProc, 'total_num_atoms')
+trainDataProc, added_features2=generateFeatures.generate_features(trainDataProc, 'min_bond_dist_binned_x')
+trainDataProc, added_features3=generateFeatures.generate_features(trainDataProc, 'atom_x')
+
+added_features=added_features0 + added_features1 + added_features2 + added_features3
+print (added_features)
 
 # TODO: Split in to 8 data sets (x2 for train and test).
 # Split data set in to 8.
@@ -69,7 +83,7 @@ trainDataLoop = [trainData1,
 
 
 # Prepare train X and Y column names.
-trainColumnsX = ['bond_dist']
+trainColumnsX = ['bond_dist']+added_features
 trainColumnsY = ['scalar_coupling_constant']
 
 # Train params; set as same for all 8 data sets.
@@ -79,7 +93,7 @@ params = {
     'metric': {'mae'},
     'num_leaves': 25,
     'learning_rate': 0.0001,
-    'num_iterations': 500,
+    'num_iterations': 200,
     'feature_fraction': 0.9,
     'bagging_fraction': 0.8,
     'bagging_freq': 5,
@@ -108,7 +122,7 @@ for i in range(len(trainDataLoop)):
                     lgbTrain,
                     num_boost_round=200,
                     valid_sets=lgbEval,
-                    early_stopping_rounds=500)
+                    early_stopping_rounds=200)
 
     print("Saving model for type ", i, end=".\n")
     modelName = 'modelType' + str(i)
@@ -119,11 +133,19 @@ for i in range(len(trainDataLoop)):
 
 print(models)
 
-# TODO: Apply model to imported test data.
-# print(testDataProc.head())
-# testSubmissionX = ['bond_dist']
-# prediction = gbm.predict(testDataProc[testSubmissionX])
-# testDataSubmission = testDataProc[['id']]
-# testDataSubmission['scalar_coupling_constant'] = prediction # Can be made better. Use iloc.
-# print(testDataSubmission.head())
-# testDataSubmission.to_csv('submissionCSV.csv', index_label=False)
+#TODO: Apply model to imported test data.
+#NEW: add new groups and features to test data
+testDataProc=generateFeatures.newGroupBy(testDataProc)
+
+testDataProc, added_features0=generateFeatures.generate_features(testDataProc, 'molecule_name')
+testDataProc, added_features1=generateFeatures.generate_features(testDataProc, 'total_num_atoms')
+testDataProc, added_features2=generateFeatures.generate_features(testDataProc, 'min_bond_dist_binned_x')
+testDataProc, added_features3=generateFeatures.generate_features(testDataProc, 'atom_x')
+print(testDataProc.head())
+
+testSubmissionX = ['bond_dist']+added_features
+prediction = gbm.predict(testDataProc[testSubmissionX])
+testDataSubmission = testDataProc[['id']]
+testDataSubmission['scalar_coupling_constant'] = prediction # Can be made better. Use iloc.
+print(testDataSubmission.head())
+testDataSubmission.to_csv('submissionCSV.csv', index_label=False)

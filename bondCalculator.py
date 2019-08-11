@@ -17,7 +17,7 @@ def calcBondLengths(dataLocation, structureDataLocation, dataSetType, saveResult
     # Map atomic coordinates to dataset.
     procData = map_atom_info(dataRaw, structureDataRaw, 0)
     procData = map_atom_info(procData, structureDataRaw, 1)
-
+    procData = procData.drop('total_num_atoms_x', axis=1).rename(columns={'total_num_atoms_y':'total_num_atoms'})
     print("Calculating bond lengths.")
     # Calculate bond length
     procData['bond_dist'] = procData.apply(lambda x: dist(x), axis=1)
@@ -41,7 +41,7 @@ def calcBondLengths(dataLocation, structureDataLocation, dataSetType, saveResult
         procData.to_csv("testDataPrepared.csv")
         print("Saved.")
 
-    return dataRaw
+    return procData
 
 
 def map_atom_info(df, structureData, atom_idx):
