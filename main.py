@@ -11,8 +11,6 @@ TYPES_LIST = [
 
 import bondCalculator
 import generateFeatures
-import saveSubmissionFile
-import importTestData
 import sklearn.model_selection as mls
 import lightgbm as lgb
 import os
@@ -20,8 +18,8 @@ import pandas as pd
 from collections import Counter
 
 # Define file locations (for my local machine/in my working directory).
-trainDataLocation = "C:\\Users\\lawre\\Downloads\\train.csv (1)\\train.csv"
-testDataLocation = "C:\\Users\\lawre\\Downloads\\train.csv (1)\\test.csv"
+trainDataLocation = "train.csv"
+testDataLocation = "test.csv"
 structureDataLocation = "structureDataPrepared.csv" #NEW: created new structure csv by adding total number of atoms in each molecule using 'total_num_atoms.py'
 #dipoleDataLocation = "dipole_moments.csv"
 
@@ -125,7 +123,7 @@ for i in range(len(trainDataLoop)):
                     early_stopping_rounds=200)
 
     print("Saving model for type ", i, end=".\n")
-    modelName = 'modelType' + str(i)
+    modelName = 'modelType' + str(i) + '.txt'
     gbm.save_model(modelName)
     models.append(gbm)
     print("Model saved.")
@@ -137,15 +135,58 @@ print(models)
 #NEW: add new groups and features to test data
 testDataProc=generateFeatures.newGroupBy(testDataProc)
 
+# Maybe for loop this shit?
 testDataProc, added_features0=generateFeatures.generate_features(testDataProc, 'molecule_name')
 testDataProc, added_features1=generateFeatures.generate_features(testDataProc, 'total_num_atoms')
 testDataProc, added_features2=generateFeatures.generate_features(testDataProc, 'min_bond_dist_binned_x')
 testDataProc, added_features3=generateFeatures.generate_features(testDataProc, 'atom_x')
 print(testDataProc.head())
 
+# Create 8 datasets from existing testDataProc for each coupling type.
+typesDictTest = dict(tuple(testDataProc.groupby('type')))
+
+testData1 = typesDict[TYPES_LIST[0]]
+testData2 = typesDict[TYPES_LIST[1]]
+testData3 = typesDict[TYPES_LIST[2]]
+testData4 = typesDict[TYPES_LIST[3]]
+testData5 = typesDict[TYPES_LIST[4]]
+testData6 = typesDict[TYPES_LIST[5]]
+testData7 = typesDict[TYPES_LIST[6]]
+testData8 = typesDict[TYPES_LIST[7]]
+
+# Store these all in same order as the train data.
+testDataLoop = [
+    testData1,
+    testData2,
+    testData3,
+    testData4,
+    testData5,
+    testData6,
+    testData7,
+    testData8
+    ]
+
 testSubmissionX = ['bond_dist']+added_features
-prediction = gbm.predict(testDataProc[testSubmissionX])
-testDataSubmission = testDataProc[['id']]
-testDataSubmission['scalar_coupling_constant'] = prediction # Can be made better. Use iloc.
-print(testDataSubmission.head())
+
+# This is the annoying part. Forgive me Jeff Bezos for I am about to perform sin
+
+for i in range(0,len(models)):
+
+    modelName = 'modelType' + str(i) + ".txt"
+    currentModel = lgb.Booster(model_file=modelName)
+    prediction = currentModel.predict(testDataLoop[i][testSubmissionX])
+    print(prediction)
+    testDataLoop[i]['scalar_coupling_constant'] = prediction
+
+# Lawd help me
+# Merge all predictions together and save.
+finalResult = pd.concat(testDataLoop)
+testDataSubmission = finalResult[['id', 'scalar_coupling_constant']]
 testDataSubmission.to_csv('submissionCSV.csv', index_label=False)
+
+
+#prediction = gbm.predict(testDataProc[testSubmissionX])
+#testDataSubmission = testDataProc[['id']]
+#testDataSubmission['scalar_coupling_constant'] = prediction # Can be made better. Use iloc.
+#print(testDataSubmission.head())
+#testDataSubmission.to_csv('submissionCSV.csv', index_label=False)

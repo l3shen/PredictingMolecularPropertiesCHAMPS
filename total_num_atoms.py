@@ -6,7 +6,7 @@ import time
 import sys
 
 
-structureDataLocation = "C:\\Users\\lawre\\Downloads\\train.csv (1)\\structures.csv"
+structureDataLocation = "structures.csv"
 
 structuredata=pd.read_csv(structureDataLocation, header=0)
 
