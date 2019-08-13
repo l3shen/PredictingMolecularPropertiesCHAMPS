@@ -80,11 +80,20 @@ trainDataLoop = [trainData1,
                  trainData8
                  ]
 
+# Save each train data.
+saveTrain = True
+if saveTrain:
+    counter = 0
+    for entry in trainDataLoop:
+        filename = 'trainDataSet_' + str(counter) + '_' + TYPES_LIST[counter] + '.csv'
+        entry.to_csv(filename)
+        counter += 1
 
 # Prepare train X and Y column names.
 trainColumnsX = ['bond_dist']+added_features
 trainColumnsY = ['scalar_coupling_constant']
 
+# TODO: Create JSON object to store params for each dataset.
 # Train params; set as same for all 8 data sets.
 params = {
     'boosting_type': 'gbdt',
