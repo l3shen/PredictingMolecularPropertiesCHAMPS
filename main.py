@@ -15,6 +15,7 @@ import sklearn.model_selection as mls
 import lightgbm as lgb
 import os
 import pandas as pd
+import statistics
 from collections import Counter
 
 # Define file locations (for my local machine/in my working directory).
@@ -98,38 +99,42 @@ params = {
     'verbose': 0
 }
 
+# Rudimentary check to bypass having to redo model calculations.
+if os.path.exists('modelType0.txt') == False:
 # Empty list of models for our training later.
-models = []
+    models = []
 
-# for loop start for training
-for i in range(len(trainDataLoop)):
+    # for loop start for training
+    for i in range(len(trainDataLoop)):
 
-    # Perform K-fold split and prepare model.
-    kfold = mls.KFold(n_splits=5, shuffle=True, random_state=0)
-    result = next(kfold.split(trainDataLoop[i]), None)
-    train = trainDataLoop[i].iloc[result[0]]
-    test = trainDataLoop[i].iloc[result[1]]
+        # Perform K-fold split and prepare model.
+        kfold = mls.KFold(n_splits=5, shuffle=True, random_state=0)
+        result = next(kfold.split(trainDataLoop[i]), None)
+        train = trainDataLoop[i].iloc[result[0]]
+        test = trainDataLoop[i].iloc[result[1]]
 
-    # Train model via lightGBM.
-    lgbTrain = lgb.Dataset(train[trainColumnsX], train[trainColumnsY])
-    lgbEval = lgb.Dataset(test[trainColumnsX], test[trainColumnsY])
+        # Train model via lightGBM.
+        lgbTrain = lgb.Dataset(train[trainColumnsX], train[trainColumnsY])
+        lgbEval = lgb.Dataset(test[trainColumnsX], test[trainColumnsY])
 
-    # Set up training.
-    print("Beginning training for type ", i, end=".\n")
-    gbm = lgb.train(params,
-                    lgbTrain,
-                    num_boost_round=200,
-                    valid_sets=lgbEval,
-                    early_stopping_rounds=200)
+        # Set up training.
+        print("Beginning training for type ", i, end=".\n")
+        gbm = lgb.train(params,
+                        lgbTrain,
+                        num_boost_round=200,
+                        valid_sets=lgbEval,
+                        early_stopping_rounds=200)
 
-    print("Saving model for type ", i, end=".\n")
-    modelName = 'modelType' + str(i) + '.txt'
-    gbm.save_model(modelName)
-    models.append(gbm)
-    print("Model saved.")
-    # for loop end
+        print("Saving model for type ", i, end=".\n")
+        modelName = 'modelType' + str(i) + '.txt'
+        gbm.save_model(modelName)
+        models.append(gbm)
+        print("Model saved.")
+        # for loop end
 
-print(models)
+    print(models)
+else:
+    print("Models already exist in root directory, loading these up.")
 
 #TODO: Apply model to imported test data.
 #NEW: add new groups and features to test data
@@ -145,14 +150,14 @@ print(testDataProc.head())
 # Create 8 datasets from existing testDataProc for each coupling type.
 typesDictTest = dict(tuple(testDataProc.groupby('type')))
 
-testData1 = typesDict[TYPES_LIST[0]]
-testData2 = typesDict[TYPES_LIST[1]]
-testData3 = typesDict[TYPES_LIST[2]]
-testData4 = typesDict[TYPES_LIST[3]]
-testData5 = typesDict[TYPES_LIST[4]]
-testData6 = typesDict[TYPES_LIST[5]]
-testData7 = typesDict[TYPES_LIST[6]]
-testData8 = typesDict[TYPES_LIST[7]]
+testData1 = typesDictTest[TYPES_LIST[0]]
+testData2 = typesDictTest[TYPES_LIST[1]]
+testData3 = typesDictTest[TYPES_LIST[2]]
+testData4 = typesDictTest[TYPES_LIST[3]]
+testData5 = typesDictTest[TYPES_LIST[4]]
+testData6 = typesDictTest[TYPES_LIST[5]]
+testData7 = typesDictTest[TYPES_LIST[6]]
+testData8 = typesDictTest[TYPES_LIST[7]]
 
 # Store these all in same order as the train data.
 testDataLoop = [
@@ -169,20 +174,37 @@ testDataLoop = [
 testSubmissionX = ['bond_dist']+added_features
 
 # This is the annoying part. Forgive me Jeff Bezos for I am about to perform sin
-
-for i in range(0,len(models)):
+totalCol = 0
+print("Generating predictions.")
+for i in range(0,len(testDataLoop)):
 
     modelName = 'modelType' + str(i) + ".txt"
     currentModel = lgb.Booster(model_file=modelName)
     prediction = currentModel.predict(testDataLoop[i][testSubmissionX])
-    print(prediction)
+    print(statistics.mean(prediction))
     testDataLoop[i]['scalar_coupling_constant'] = prediction
+    totalCol += len(prediction)
 
+print(totalCol)
 # Lawd help me
 # Merge all predictions together and save.
 finalResult = pd.concat(testDataLoop)
-testDataSubmission = finalResult[['id', 'scalar_coupling_constant']]
-testDataSubmission.to_csv('submissionCSV.csv', index_label=False)
+print(finalResult.head())
+submissionColumns = ['id', 'scalar_coupling_constant']
+testDataSubmission = finalResult[submissionColumns]
+print(testDataSubmission.head())
+# TODO: Make this prettier.
+# Prep for merging.
+# testDataProc['id'] = testDataProc['id'].astype(int)
+# testDataSubmission['id'] = testDataSubmission['id'].astype(int)
+# testDataSubmissionRedux = pd.merge(testDataProc[['id']], testDataSubmission,
+#                                 on='id',
+#                                 how='outer')
+# print(testDataSubmissionRedux.head())
+print("Saving test data predictions.")
+print(len(testDataSubmission.index))
+
+testDataSubmission.to_csv('submissionCSV.csv', columns=submissionColumns, index=False)
 
 
 #prediction = gbm.predict(testDataProc[testSubmissionX])
