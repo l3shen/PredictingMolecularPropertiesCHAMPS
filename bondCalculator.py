@@ -5,49 +5,43 @@ import math
 import time
 import sys
 
-TYPE_DICT = {
-    '3JHC': 0,
-    '2JHC': 1,
-    '1JHC': 2,
-    '3JHH': 3,
-    '2JHH': 4,
-    '3JHN': 5,
-    '2JHN': 6,
-    '1JHN': 7
-}
-
-def calcBondLengths(trainDataLocation, structureDataLocation, saveResults=True, verbose=True):
+def calcBondLengths(dataLocation, structureDataLocation, dataSetType, saveResults=True, verbose=True):
 
     # Load in data.
-    trainDataRaw = pd.read_csv(trainDataLocation, header=0, index_col='id')
+    dataRaw = pd.read_csv(dataLocation, header=0)
     structureDataRaw = pd.read_csv(structureDataLocation, header=0)
     # dipoleData = pd.read_csv(dipoleDataLocation, header=0)
 
     print("Preparing data.")
 
     # Map atomic coordinates to dataset.
-    trainData = map_atom_info(trainDataRaw, structureDataRaw, 0)
-    trainData = map_atom_info(trainData, structureDataRaw, 1)
-
+    procData = map_atom_info(dataRaw, structureDataRaw, 0)
+    procData = map_atom_info(procData, structureDataRaw, 1)
+    procData = procData.drop('total_num_atoms_x', axis=1).rename(columns={'total_num_atoms_y':'total_num_atoms'})
     print("Calculating bond lengths.")
     # Calculate bond length
-    trainData['bond_dist'] = trainData.apply(lambda x: dist(x), axis=1)
+    procData['bond_dist'] = procData.apply(lambda x: dist(x), axis=1)
 
     # Convert type data to generic integer format.
-    trainData['type'].replace(TYPE_DICT, inplace=True)
+    # trainData['type'].replace(TYPE_DICT, inplace=True)
 
     # Check to see if everything is a-OK.
     if verbose:
-        print(trainData.head(20))
+        print(procData.head(20))
 
     # Save new structure data to csv file for ease of access later.
     # TODO: Save as HDF5? Pickle seems to run out of memory fast.
 
-    if saveResults:
-        print("Saving results to CSV file.")
-        trainData.to_csv("trainDataPrepared.csv")
+    if saveResults and dataSetType == 'train':
+        print("Saving train results to CSV file.")
+        procData.to_csv("trainDataPrepared.csv")
+        print("Saved.")
+    elif saveResults and dataSetType == 'test':
+        print("Saving test results to CSV file.")
+        procData.to_csv("testDataPrepared.csv")
+        print("Saved.")
 
-    return trainDataRaw
+    return procData
 
 
 def map_atom_info(df, structureData, atom_idx):
@@ -66,3 +60,7 @@ def dist(row):
     return ( (row['x_1'] - row['x_0'])**2 +
              (row['y_1'] - row['y_0'])**2 +
              (row['z_1'] - row['z_0'])**2 ) ** 0.5
+
+
+
+
