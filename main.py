@@ -81,7 +81,7 @@ trainDataLoop = [trainData1,
                  ]
 
 # Save each train data.
-saveTrain = True
+saveTrain = False
 if saveTrain:
     counter = 0
     for entry in trainDataLoop:
@@ -95,18 +95,144 @@ trainColumnsY = ['scalar_coupling_constant']
 
 # TODO: Create JSON object to store params for each dataset.
 # Train params; set as same for all 8 data sets.
-params = {
+params1 = {
     'boosting_type': 'gbdt',
     'objective': 'regression',
     'metric': {'mae'},
-    'num_leaves': 25,
-    'learning_rate': 0.0001,
-    'num_iterations': 200,
-    'feature_fraction': 0.9,
+    'num_leaves': 424,
+    'learning_rate': 0.362,
+    'num_iterations': 1000,
+    'feature_fraction': 0.685,
     'bagging_fraction': 0.8,
-    'bagging_freq': 5,
-    'verbose': 0
+    'bagging_freq': 23,
+    'verbose': 0,
+    'min_child_sample': 79,
+    'reg_alpha': 0,
+    'reg_lambda': 1,
+    'subsample': 0.651
 }
+
+params2 = {
+    'boosting_type': 'gbdt',
+    'objective': 'regression',
+    'metric': {'mae'},
+    'num_leaves': 237,
+    'learning_rate': 0.231,
+    'num_iterations': 1000,
+    'feature_fraction': 0.529,
+    'bagging_fraction': 0.560,
+    'bagging_freq': 19,
+    'verbose': 0,
+    'min_child_sample': 57,
+    'reg_alpha': 1,
+    'reg_lambda': 0,
+    'subsample': 0.388
+}
+
+params3 = {
+    'boosting_type': 'gbdt',
+    'objective': 'regression',
+    'metric': {'mae'},
+    'num_leaves': 183,
+    'learning_rate': 0.313,
+    'num_iterations': 1000,
+    'feature_fraction': 0.721,
+    'bagging_fraction': 0.694,
+    'bagging_freq': 22,
+    'verbose': 0,
+    'min_child_sample': 68,
+    'reg_alpha': 0,
+    'reg_lambda': 0,
+    'subsample': 0.307
+}
+
+params4 = {
+    'boosting_type': 'gbdt',
+    'objective': 'regression',
+    'metric': {'mae'},
+    'num_leaves': 349,
+    'learning_rate': 0.0001,
+    'num_iterations': 1000,
+    'feature_fraction': 0.401,
+    'bagging_fraction': 0.730,
+    'bagging_freq': 21,
+    'verbose': 0,
+    'min_child_sample': 37,
+    'reg_alpha': 0,
+    'reg_lambda': 0,
+    'subsample': 0.821
+}
+
+params5 = {
+    'boosting_type': 'gbdt',
+    'objective': 'regression',
+    'metric': {'mae'},
+    'num_leaves': 575,
+    'learning_rate': 0.169,
+    'num_iterations': 1000,
+    'feature_fraction': 0.684,
+    'bagging_fraction': 0.641,
+    'bagging_freq': 3,
+    'verbose': 0,
+    'min_child_sample': 60,
+    'reg_alpha': 0,
+    'reg_lambda': 1,
+    'subsample': 0.248
+}
+
+params6 = {
+    'boosting_type': 'gbdt',
+    'objective': 'regression',
+    'metric': {'mae'},
+    'num_leaves': 411,
+    'learning_rate': 0.107,
+    'num_iterations': 1000,
+    'feature_fraction': 0.551,
+    'bagging_fraction': 0.852,
+    'bagging_freq': 49,
+    'verbose': 0,
+    'min_child_sample': 79,
+    'reg_alpha': 1,
+    'reg_lambda': 1,
+    'subsample': 0.476
+}
+
+params7 = {
+    'boosting_type': 'gbdt',
+    'objective': 'regression',
+    'metric': {'mae'},
+    'num_leaves': 392,
+    'learning_rate': 0.117,
+    'num_iterations': 1000,
+    'feature_fraction': 0.670,
+    'bagging_fraction': 0.883,
+    'bagging_freq': 2,
+    'verbose': 0,
+    'min_child_sample': 12,
+    'reg_alpha': 1,
+    'reg_lambda': 0,
+    'subsample': 0.887
+}
+
+params8 = {
+    'boosting_type': 'gbdt',
+    'objective': 'regression',
+    'metric': {'mae'},
+    'num_leaves': 220,
+    'learning_rate': 0.228,
+    'num_iterations': 1000,
+    'feature_fraction': 0.702,
+    'bagging_fraction': 0.799,
+    'bagging_freq': 27,
+    'verbose': 0,
+    'min_child_sample': 22,
+    'reg_alpha': 0,
+    'reg_lambda': 1,
+    'subsample': 0.447
+}
+
+#define params to link to list of 8
+params = [params1, params2, params3, params4, params5, params6, params7, params8]
 
 # Rudimentary check to bypass having to redo model calculations.
 if os.path.exists('modelType0.txt') == False:
@@ -128,7 +254,7 @@ if os.path.exists('modelType0.txt') == False:
 
         # Set up training.
         print("Beginning training for type ", i, end=".\n")
-        gbm = lgb.train(params,
+        gbm = lgb.train(params[i],
                         lgbTrain,
                         num_boost_round=200,
                         valid_sets=lgbEval,
