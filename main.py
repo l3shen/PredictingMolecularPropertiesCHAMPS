@@ -11,12 +11,14 @@ TYPES_LIST = [
 
 import bondCalculator
 import generateFeatures
+import paramAutomate
 import sklearn.model_selection as mls
 import lightgbm as lgb
 import os
 import pandas as pd
 import statistics
 from collections import Counter
+import pickle
 
 # Define file locations (for my local machine/in my working directory).
 trainDataLocation = "train.csv"
@@ -94,142 +96,22 @@ trainColumnsX = ['bond_dist']+added_features
 trainColumnsY = ['scalar_coupling_constant']
 
 # TODO: Create JSON object to store params for each dataset.
-# Train params; set as same for all 8 data sets.
-params1 = {
-    'boosting_type': 'gbdt',
-    'objective': 'regression',
-    'metric': {'mae'},
-    'num_leaves': 424,
-    'learning_rate': 0.362,
-    'num_iterations': 1000,
-    'feature_fraction': 0.685,
-    'bagging_fraction': 0.8,
-    'bagging_freq': 23,
-    'verbose': 0,
-    'min_child_sample': 79,
-    'reg_alpha': 0,
-    'reg_lambda': 1,
-    'subsample': 0.651
-}
 
-params2 = {
-    'boosting_type': 'gbdt',
-    'objective': 'regression',
-    'metric': {'mae'},
-    'num_leaves': 237,
-    'learning_rate': 0.231,
-    'num_iterations': 1000,
-    'feature_fraction': 0.529,
-    'bagging_fraction': 0.560,
-    'bagging_freq': 19,
-    'verbose': 0,
-    'min_child_sample': 57,
-    'reg_alpha': 1,
-    'reg_lambda': 0,
-    'subsample': 0.388
-}
+# Load in params, generate if pkl file not available.
+if os.path.isfile('params.pkl'):
+    paramsDict = pickle.load(open('params.pkl', 'rb'))
+else:
+    paramsDict = paramAutomate.loadResults(save=True)
 
-params3 = {
-    'boosting_type': 'gbdt',
-    'objective': 'regression',
-    'metric': {'mae'},
-    'num_leaves': 183,
-    'learning_rate': 0.313,
-    'num_iterations': 1000,
-    'feature_fraction': 0.721,
-    'bagging_fraction': 0.694,
-    'bagging_freq': 22,
-    'verbose': 0,
-    'min_child_sample': 68,
-    'reg_alpha': 0,
-    'reg_lambda': 0,
-    'subsample': 0.307
-}
-
-params4 = {
-    'boosting_type': 'gbdt',
-    'objective': 'regression',
-    'metric': {'mae'},
-    'num_leaves': 349,
-    'learning_rate': 0.0001,
-    'num_iterations': 1000,
-    'feature_fraction': 0.401,
-    'bagging_fraction': 0.730,
-    'bagging_freq': 21,
-    'verbose': 0,
-    'min_child_sample': 37,
-    'reg_alpha': 0,
-    'reg_lambda': 0,
-    'subsample': 0.821
-}
-
-params5 = {
-    'boosting_type': 'gbdt',
-    'objective': 'regression',
-    'metric': {'mae'},
-    'num_leaves': 575,
-    'learning_rate': 0.169,
-    'num_iterations': 1000,
-    'feature_fraction': 0.684,
-    'bagging_fraction': 0.641,
-    'bagging_freq': 3,
-    'verbose': 0,
-    'min_child_sample': 60,
-    'reg_alpha': 0,
-    'reg_lambda': 1,
-    'subsample': 0.248
-}
-
-params6 = {
-    'boosting_type': 'gbdt',
-    'objective': 'regression',
-    'metric': {'mae'},
-    'num_leaves': 411,
-    'learning_rate': 0.107,
-    'num_iterations': 1000,
-    'feature_fraction': 0.551,
-    'bagging_fraction': 0.852,
-    'bagging_freq': 49,
-    'verbose': 0,
-    'min_child_sample': 79,
-    'reg_alpha': 1,
-    'reg_lambda': 1,
-    'subsample': 0.476
-}
-
-params7 = {
-    'boosting_type': 'gbdt',
-    'objective': 'regression',
-    'metric': {'mae'},
-    'num_leaves': 392,
-    'learning_rate': 0.117,
-    'num_iterations': 1000,
-    'feature_fraction': 0.670,
-    'bagging_fraction': 0.883,
-    'bagging_freq': 2,
-    'verbose': 0,
-    'min_child_sample': 12,
-    'reg_alpha': 1,
-    'reg_lambda': 0,
-    'subsample': 0.887
-}
-
-params8 = {
-    'boosting_type': 'gbdt',
-    'objective': 'regression',
-    'metric': {'mae'},
-    'num_leaves': 220,
-    'learning_rate': 0.228,
-    'num_iterations': 1000,
-    'feature_fraction': 0.702,
-    'bagging_fraction': 0.799,
-    'bagging_freq': 27,
-    'verbose': 0,
-    'min_child_sample': 22,
-    'reg_alpha': 0,
-    'reg_lambda': 1,
-    'subsample': 0.447
-}
+# Generate params.
+params1 = paramsDict[0]
+params2 = paramsDict[1]
+params3 = paramsDict[2]
+params4 = paramsDict[3]
+params5 = paramsDict[4]
+params6 = paramsDict[5]
+params7 = paramsDict[6]
+params8 = paramsDict[7]
 
 #define params to link to list of 8
 params = [params1, params2, params3, params4, params5, params6, params7, params8]
@@ -271,7 +153,6 @@ if os.path.exists('modelType0.txt') == False:
 else:
     print("Models already exist in root directory, loading these up.")
 
-#TODO: Apply model to imported test data.
 #NEW: add new groups and features to test data
 testDataProc=generateFeatures.newGroupBy(testDataProc)
 
@@ -309,7 +190,6 @@ testDataLoop = [
 testSubmissionX = ['bond_dist']+added_features
 
 # This is the annoying part. Forgive me Jeff Bezos for I am about to perform sin
-totalCol = 0
 print("Generating predictions.")
 for i in range(0,len(testDataLoop)):
 
@@ -318,32 +198,21 @@ for i in range(0,len(testDataLoop)):
     prediction = currentModel.predict(testDataLoop[i][testSubmissionX])
     print(statistics.mean(prediction))
     testDataLoop[i]['scalar_coupling_constant'] = prediction
-    totalCol += len(prediction)
 
-print(totalCol)
 # Lawd help me
 # Merge all predictions together and save.
 finalResult = pd.concat(testDataLoop)
-print(finalResult.head())
 submissionColumns = ['id', 'scalar_coupling_constant']
 testDataSubmission = finalResult[submissionColumns]
-print(testDataSubmission.head())
-# TODO: Make this prettier.
+
 # Prep for merging.
-# testDataProc['id'] = testDataProc['id'].astype(int)
-# testDataSubmission['id'] = testDataSubmission['id'].astype(int)
-# testDataSubmissionRedux = pd.merge(testDataProc[['id']], testDataSubmission,
-#                                 on='id',
-#                                 how='outer')
-# print(testDataSubmissionRedux.head())
+testDataProc['id'] = testDataProc['id'].astype(int)
+testDataSubmission['id'] = testDataSubmission['id'].astype(int)
+testDataSubmissionRedux = pd.merge(testDataProc[['id']], testDataSubmission,
+                                 on='id',
+                                 how='outer')
+
 print("Saving test data predictions.")
 print(len(testDataSubmission.index))
 
 testDataSubmission.to_csv('submissionCSV.csv', columns=submissionColumns, index=False)
-
-
-#prediction = gbm.predict(testDataProc[testSubmissionX])
-#testDataSubmission = testDataProc[['id']]
-#testDataSubmission['scalar_coupling_constant'] = prediction # Can be made better. Use iloc.
-#print(testDataSubmission.head())
-#testDataSubmission.to_csv('submissionCSV.csv', index_label=False)
