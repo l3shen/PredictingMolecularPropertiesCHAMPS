@@ -77,6 +77,136 @@ def generate_features(DataProc, group):
         'count')
     added_features += [f'{group}_atom_1_couples_count']
 
+    # Added additional features.
+    DataProc[f'{group}_molecule_atom_index_0_dist_min'] = DataProc.groupby([group, 'atom_index_0'])['bond_dist'].transform('min')
+    added_features += [f'{group}_molecule_atom_index_0_dist_min']
+
+    DataProc[f'{group}_molecule_atom_index_1_dist_max'] = DataProc.groupby([group, 'atom_index_1'])['bond_dist'].transform('max')
+    added_features += [f'{group}_molecule_atom_index_1_dist_max']
+
+    DataProc[f'{group}_molecule_atom_index_1_dist_min'] = DataProc.groupby([group, 'atom_index_1'])['bond_dist'].transform('min')
+    added_features += [f'{group}_molecule_atom_index_1_dist_min']
+
+    DataProc[f'{group}_molecule_atom_index_1_dist_mean'] = DataProc.groupby([group, 'atom_index_1'])['bond_dist'].transform('mean')
+    added_features += [f'{group}_molecule_atom_index_1_dist_mean']
+
+    DataProc[f'{group}_molecule_atom_1_dist_std'] = DataProc.groupby([group, 'atom_1'])['bond_dist'].transform('std')
+    added_features += [f'{group}_molecule_atom_1_dist_std']
+
+    DataProc[f'{group}_molecule_atom_index_1_dist_std'] = DataProc.groupby([group, 'atom_index_1'])['bond_dist'].transform('std')
+    added_features += [f'{group}_molecule_atom_index_1_dist_std']
+
+    DataProc[f'{group}_molecule_atom_index_0_dist_mean_diff'] = DataProc[f'{group}_molecule_atom_index_0_dist_min']\
+                                                                - DataProc['bond_dist']
+    added_features += [f'{group}_molecule_atom_index_0_dist_mean_diff']
+
+    DataProc[f'{group}_molecule_couples'] = DataProc.groupby(group)['id'].transform('count')
+    added_features += [f'{group}_molecule_couples']
+
+    DataProc[f'{group}_molecule_dist_mean'] = DataProc.groupby(group)['bond_dist'].transform('mean')
+    added_features += [f'{group}_molecule_dist_mean']
+
+    DataProc[f'{group}_molecule_atom_index_1_dist_max_diff'] = DataProc[f'{group}_molecule_atom_index_1_dist_max']\
+                                                               - DataProc['bond_dist']
+    added_features += [f'{group}_molecule_atom_index_1_dist_max_diff']
+
+    DataProc[f'{group}_molecule_atom_index_0_y_1_std'] = DataProc.groupby([group, 'atom_index_0'])['y_1'].transform('std')
+    added_features += [f'{group}_molecule_atom_index_0_y_1_std']
+
+    DataProc[f'{group}_molecule_atom_index_1_dist_mean_diff'] = DataProc[f'{group}_molecule_atom_index_1_dist_mean'] \
+                                                                - DataProc['bond_dist']
+    added_features += [f'{group}_molecule_atom_index_1_dist_mean_diff']
+
+    DataProc[f'{group}_molecule_atom_index_1_dist_std_div'] = DataProc[f'{group}_molecule_atom_index_1_dist_std'] / DataProc['bond_dist']
+    added_features += [f'{group}_molecule_atom_index_1_dist_std_div']
+
+    DataProc[f'{group}_molecule_atom_index_1_dist_mean_div'] = DataProc[f'{group}_molecule_atom_index_1_dist_mean'] / DataProc['bond_dist']
+    added_features += [f'{group}_molecule_atom_index_1_dist_mean_div']
+
+    DataProc[f'{group}_molecule_atom_index_1_dist_min_diff'] = DataProc[f'{group}_molecule_atom_index_1_dist_min'] - DataProc['bond_dist']
+    added_features += [f'{group}_molecule_atom_index_1_dist_min_diff']
+
+    DataProc[f'{group}_molecule_atom_index_1_dist_min_div'] = DataProc[f'{group}_molecule_atom_index_1_dist_min'] / DataProc['bond_dist']
+    added_features += [f'{group}_molecule_atom_index_1_dist_min_div']
+
+    DataProc[f'{group}_molecule_atom_index_1_dist_min_div'] = DataProc[f'{group}_molecule_atom_index_1_dist_min'] / DataProc['bond_dist']
+    added_features += [f'{group}_molecule_atom_index_1_dist_min_div']
+
+    DataProc[f'{group}_molecule_atom_index_1_dist_max_div'] = DataProc[f'{group}_molecule_atom_index_1_dist_max'] / DataProc['bond_dist']
+    added_features += [f'{group}_molecule_atom_index_1_dist_max_div']
+
+    DataProc[f'{group}_molecule_atom_index_0_z_1_std'] = DataProc.groupby([group, 'atom_index_0'])['z_1'].transform('std')
+    added_features += [f'{group}_molecule_atom_index_0_z_1_std']
+
+    DataProc[f'{group}_molecule_type_dist_std'] = DataProc.groupby([group, 'type'])['bond_dist'].transform('std')
+    added_features += [f'{group}_molecule_type_dist_std']
+
+    DataProc[f'{group}_molecule_type_dist_std_diff'] = DataProc[f'{group}_molecule_type_dist_std'] - DataProc['bond_dist']
+    added_features += [f'{group}_molecule_type_dist_std_diff']
+
+    DataProc[f'{group}_molecule_atom_1_dist_min'] = DataProc.groupby([group, 'atom_1'])['bond_dist'].transform('min')
+    added_features += [f'{group}_molecule_atom_1_dist_min']
+
+    DataProc[f'{group}_molecule_atom_1_dist_min_diff'] = DataProc[f'{group}_molecule_atom_1_dist_min'] - DataProc['bond_dist']
+    added_features += [f'{group}_molecule_atom_1_dist_min_diff']
+
+    DataProc[f'{group}_molecule_atom_index_0_x_1_std'] = DataProc.groupby([group, 'atom_index_0'])['x_1'].transform('std')
+    added_features += [f'{group}_molecule_atom_index_0_x_1_std']
+
+    DataProc[f'{group}_molecule_dist_min'] = DataProc.groupby(group)['bond_dist'].transform('min')
+    added_features += [f'{group}_molecule_dist_min']
+
+    DataProc[f'{group}_molecule_atom_index_0_dist_min_diff'] = DataProc[f'{group}_molecule_atom_index_0_dist_min'] - DataProc['bond_dist']
+    added_features += [f'{group}_molecule_atom_index_0_dist_min_diff']
+
+    DataProc[f'{group}_molecule_atom_index_0_y_1_mean'] = DataProc.groupby([group, 'atom_index_0'])['y_1'].transform('mean')
+    added_features += [f'{group}_molecule_atom_index_0_y_1_mean']
+
+    DataProc[f'{group}_molecule_atom_index_0_y_1_mean_diff'] = DataProc[f'{group}_molecule_atom_index_0_y_1_mean'] - DataProc['y_1']
+    added_features += [f'{group}_molecule_atom_index_0_y_1_mean_diff']
+
+    DataProc[f'{group}_molecule_type_dist_min'] = DataProc.groupby([group, 'type'])['bond_dist'].transform('min')
+    added_features += [f'{group}_molecule_type_dist_min']
+
+    DataProc[f'{group}_molecule_atom_1_dist_min_div'] = DataProc[f'{group}_molecule_atom_1_dist_min'] / DataProc['bond_dist']
+    added_features += [f'{group}_molecule_atom_1_dist_min_div']
+
+    DataProc[f'{group}_molecule_dist_max'] = DataProc.groupby(group)['bond_dist'].transform('max')
+    added_features += [f'{group}_molecule_dist_max']
+
+    DataProc[f'{group}_molecule_atom_1_dist_std_diff'] = DataProc[f'{group}_molecule_atom_1_dist_std'] - DataProc['bond_dist']
+    added_features += [f'{group}_molecule_atom_1_dist_std_diff']
+
+    DataProc[f'{group}_molecule_type_dist_max'] = DataProc.groupby([group, 'type'])['bond_dist'].transform('max')
+    added_features += [f'{group}_molecule_type_dist_max']
+
+    DataProc[f'{group}_molecule_atom_index_0_y_1_max'] = DataProc.groupby([group, 'atom_index_0'])['y_1'].transform('max')
+    added_features += [f'{group}_molecule_atom_index_0_y_1_max']
+
+    DataProc[f'{group}_molecule_atom_index_0_y_1_max_diff'] = DataProc[f'{group}_molecule_atom_index_0_y_1_max'] - DataProc['y_1']
+    added_features += [f'{group}_molecule_atom_index_0_y_1_max_diff']
+
+    #DataProc[f'{group}_molecule_type_0_dist_std'] = DataProc.groupby([group, 'type_0'])['bond_dist'].transform('std')
+    # added_features += [f'{group}_molecule_type_0_dist_std']
+
+    #DataProc[f'{group}_molecule_type_0_dist_std_diff'] = DataProc[f'{group}_molecule_type_0_dist_std'] - DataProc['bond_dist']
+    #added_features += [f'{group}_molecule_type_0_dist_std_diff']
+
+    DataProc[f'{group}_molecule_type_dist_mean'] = DataProc.groupby([group, 'type'])['bond_dist'].transform('mean')
+    added_features += [f'{group}_molecule_type_dist_mean']
+
+    DataProc[f'{group}_molecule_type_dist_mean_diff'] = DataProc[f'{group}_molecule_type_dist_mean'] - DataProc['bond_dist']
+    added_features += [f'{group}_molecule_type_dist_mean_diff']
+
+    DataProc[f'{group}_molecule_atom_1_dist_mean'] = DataProc.groupby([group, 'atom_1'])['bond_dist'].transform('mean')
+    added_features += [f'{group}_molecule_atom_1_dist_mean']
+
+    DataProc[f'{group}_molecule_atom_index_0_y_1_mean_div'] = DataProc[f'{group}_molecule_atom_index_0_y_1_mean'] / DataProc['y_1']
+    added_features += [f'{group}_molecule_atom_index_0_y_1_mean_div']
+
+    DataProc[f'{group}_molecule_type_dist_mean_div'] = DataProc[f'{group}_molecule_type_dist_mean'] / DataProc['bond_dist']
+    added_features += [f'{group}_molecule_type_dist_mean_div']
+
     return DataProc, added_features
 
 def newGroupBy(DataProc): #create new columns that is the distance of the nearest neighbor to an atom in the molecule as well as the identity of the atom (C, H, N, O)
