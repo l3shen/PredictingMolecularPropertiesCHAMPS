@@ -49,13 +49,17 @@ elif os.path.isfile('testDataPrepared.csv'):
 
 #NEW: creating new groups to groupby and generating new features
 trainDataProc=generateFeatures.newGroupBy(trainDataProc)
+print ('grouped')
 
 trainDataProc, added_features0=generateFeatures.generate_features(trainDataProc, 'molecule_name')
+print ('added feature0')
 trainDataProc, added_features1=generateFeatures.generate_features(trainDataProc, 'total_num_atoms')
+print ('added feature1')
 trainDataProc, added_features2=generateFeatures.generate_features(trainDataProc, 'min_bond_dist_binned_x')
-trainDataProc, added_features3=generateFeatures.generate_features(trainDataProc, 'atom_x')
+print ('added_feature2')
+# trainDataProc, added_features3=generateFeatures.generate_features(trainDataProc, 'atom_x')
 
-added_features=added_features0 + added_features1 + added_features2 + added_features3
+added_features=added_features0 + added_features1 + added_features2# + added_features3
 print (added_features)
 
 # TODO: Split in to 8 data sets (x2 for train and test).
@@ -120,7 +124,7 @@ params = [params1, params2, params3, params4, params5, params6, params7, params8
 if os.path.exists('modelType0.txt') == False:
 # Empty list of models for our training later.
     models = []
-
+    feat_importances_list=[]
     # for loop start for training
     for i in range(len(trainDataLoop)):
 
@@ -145,6 +149,11 @@ if os.path.exists('modelType0.txt') == False:
         print("Saving model for type ", i, end=".\n")
         modelName = 'modelType' + str(i) + '.txt'
         gbm.save_model(modelName)
+
+        imp_type='gain'
+        feat_importances=pd.Series(gbm.feature_importance(importance_type=imp_type), index=trainColumnsX)
+        feat_importances_list+=[feat_importances]
+
         models.append(gbm)
         print("Model saved.")
         # for loop end
@@ -160,7 +169,7 @@ testDataProc=generateFeatures.newGroupBy(testDataProc)
 testDataProc, added_features0=generateFeatures.generate_features(testDataProc, 'molecule_name')
 testDataProc, added_features1=generateFeatures.generate_features(testDataProc, 'total_num_atoms')
 testDataProc, added_features2=generateFeatures.generate_features(testDataProc, 'min_bond_dist_binned_x')
-testDataProc, added_features3=generateFeatures.generate_features(testDataProc, 'atom_x')
+#testDataProc, added_features3=generateFeatures.generate_features(testDataProc, 'atom_x')
 print(testDataProc.head())
 
 # Create 8 datasets from existing testDataProc for each coupling type.
@@ -216,3 +225,6 @@ print("Saving test data predictions.")
 print(len(testDataSubmission.index))
 
 testDataSubmission.to_csv('submissionCSV.csv', columns=submissionColumns, index=False)
+
+# for i in range(len(feat_importances_list)):
+#     feat_importances_list[i].to_csv(f'feat_importance_{i}.csv')

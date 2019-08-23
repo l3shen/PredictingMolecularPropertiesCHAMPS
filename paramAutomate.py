@@ -1,6 +1,7 @@
 # Automatically updates params.
 import pandas as pd
 import pickle
+from ast import literal_eval
 
 def loadResults(save=True):
 
@@ -29,9 +30,14 @@ def loadResults(save=True):
 
         # Pull out params for top ranked dataset.
         param = ds['params'].iloc[0]
-
+        param = literal_eval(param)
+        param['boosting_type'] = 'gbdt'
+        param['objective'] = 'regression'
+        param['metric'] = {'mae'}
+        param['num_iterations'] = 1000
+        param['verbose'] = 0
         # Append to our list.
-        paramsDict.append(dict(param))
+        paramsDict.append(param)
 
         # Delete ds to clear up memory.
         del ds
